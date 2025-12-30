@@ -1,251 +1,175 @@
 Loan Default Risk Prediction
 
-An End-to-End Machine Learning & MLOps Project
+End-to-end data reconciliation and machine learning pipeline for predicting loan default risk using real-world financial data.
 
-1. Business Problem
+Business Context
 
-Financial institutions face persistent challenges in accurately assessing loan default risk, especially when customer behavior, financial capacity, and historical repayment patterns are fragmented across multiple data sources.
+Financial institutions face challenges in accurately assessing credit risk due to fragmented data sources and inconsistent customer records.
 
-Traditional rule-based credit scoring methods often:
+This project focuses on building a loan-level default prediction system with strong emphasis on data reconciliation, feature integrity, and production-aligned modeling practices.
 
-- Fail to capture complex borrower behavior
+Problem Statement
 
-- Do not scale well with growing data
+Predict whether a loan will default using customer demographics, loan attributes, and historical repayment behavior.
 
-- Are slow to adapt to changing risk patterns
+Objectives:
 
-Objective:
-Develop a robust, data-driven machine learning pipeline that predicts loan default risk at the loan level, enabling:
+Preserve loan-level granularity
 
-- Better credit approval decisions
+Reconcile multiple inconsistent datasets
 
-- Reduced non-performing loans
+Prevent data leakage
 
+Produce a modeling-ready dataset suitable for deployment
 
-- Improved portfolio risk management
+Datasets
 
+Loan Application Data
 
-2. Project Scope & Solution Overview
+4,368 loans
 
-This project builds an end-to-end loan default risk prediction system, covering:
+One row per loan
 
-- Multi-table data cleaning & integration
+Contains target label
 
-- Leakage-safe feature engineering
+Customer Banking Profile
 
-- Supervised ML modeling
+4,334 customer records
 
-- Model packaging and deployment (MLOps)
+Demographic and banking attributes
 
-The solution is designed to reflect real-world banking constraints, not just academic modeling.
+Repayment History
 
+18,183 historical loans
 
-3. Data Sources
+Used to derive behavioral features
 
-The dataset consists of three relational tables, each representing a different aspect of borrower information.
+Modeling Grain
 
-3.1 Loan Application (loan_application)
+One row represents one loan
 
-Role: Label authority & modeling base table
-Rows: 4,368
-Grain: One row = one loan
+This ensures:
 
-Key columns:
+Correct label alignment
 
-- customerid
+No duplicate loans
 
-- systemloanid
+Realistic credit risk modeling
 
-- loannumber
+Data Reconciliation Summary
 
-- loanamount
+Loan application table is used as the master dataset
 
-- totaldue
+Customer profiles are left-joined using customerid
 
-- termdays
+Repayment history is aggregated per customer and merged as backward-looking features
 
-good_bad_flag (target variable)
+No labeled loans are dropped
 
-This table defines the model universe.
-Only loans present here are allowed in training or inference.
+Coverage:
 
+Total loans: 4,368
 
-3.2 Customer Banking Profile (customer_banking_profile)
+Loans with customer profiles: 3,269 (74.8 percent)
 
-Role: Demographic, employment, and geospatial context
-Rows: 4,334
-Grain: One row = one customer
+Loans with repayment history: 4,359 (99.8 percent)
 
-Key features:
+Loans missing both profile and history: 4
 
-- Age
+Final Modeling Dataset
 
-- Employment status
+Shape: 4,368 rows by 20 features
 
-- Bank account type
+Target distribution:
 
-- Bank name
+Good loans: 2,556
 
-- Latitude / Longitude
+Bad loans: 713
 
-- Engineered state feature (from coordinates)
+Missing data handling:
 
-- Missing values are retained intentionally and handled during feature engineering.
+Rows are preserved
 
-3.3 Repayment History (repayment_history)
+Missing categorical values retained as explicit categories
 
-Role: Historical loan behavior
-Rows: 18,183
-Grain: One row = one loan (historical)
+Missing numeric values imputed
 
-Key features:
+Missingness treated as informative
 
-- Loan amounts and tenure
+Feature Engineering Status
 
-- Due and repayment dates
+Feature engineering is performed after all data is aligned to the loan level.
 
-- Loan lifecycle timestamps
+Planned feature groups:
 
-This table contains all historical loans, including those without labels.
-It is filtered strictly to labeled loans before modeling.
+Demographic features
 
+Financial features
 
-4. Modeling Grain & Data Integrity
+Behavioral aggregates
 
-A critical design decision:
+Temporal features
 
-- One row in the final dataset represents one loan.
+Missingness indicators
 
-- Labels exist only at the loan level
+Repository Structure
 
-- No transaction-level repayment events are assumed
+loan-default-risk
 
-- All joins are performed using:
+data
 
-customerid + systemloanid + loannumber
+raw
 
+interim
 
-This prevents:
+processed
 
-- Duplicate loan leakage
+notebooks
 
-- Inflated performance metrics
+data_cleaning
 
-- Unrealistic deployment assumptions
+data_reconciliation
 
+feature_engineering
 
-5. Data Leakage Prevention Strategy
+modeling
 
-To ensure production realism:
+src
 
-- The loan application table defines reality
+data
 
-- Repayment history is filtered using labeled loans only
+features
 
-- Customer data is left-joined (never used to filter loans)
+models
 
-- No future information is introduced into features
+utils
 
-- This mirrors how credit risk models are deployed in practice.
+reports
 
+docker
 
-6. Missing Data Philosophy
+tests
 
-Missing values are treated as informative signals, not errors.
+requirements.txt
 
-Key principles:
+README.md
 
-- No row is dropped (labels are expensive)
+.gitignore
 
-- Missing categorical values → "Unknown"
+Project Status
 
-- Missing numeric behavioral features → domain-aware imputation
+Data cleaning completed
 
-- Missingness indicators are engineered where relevant
+Data reconciliation completed
 
-- This approach aligns with real credit-scoring systems, where absence of history can itself indicate risk.
+Modeling dataset finalized
 
+Feature engineering in progress
 
-7. Feature Engineering (Ongoing)
+Modeling and deployment pending
 
-- Planned feature categories include:
+Design Philosophy
 
-- Demographic features: age, employment status, location
+This project prioritizes data correctness, transparency, and real-world applicability over shortcut modeling gains.
 
-- Financial features: loan amount, tenure, total due
-
-- Behavioral proxies: historical loan patterns
-
-- Temporal features: durations between loan events
-
-- Missingness indicators
-
-- Feature engineering is performed after all tables are aligned to the loan level.
-
-
-8. Repository Structure
-loan-default-risk/
-│
-├── data/
-│   ├── raw/                # Original datasets
-│   ├── interim/            # Cleaned individual tables
-│   └── processed/          # Final model-ready dataset
-│
-├── notebooks/
-│   ├── 01_data_cleaning/
-│   ├── 02_feature_engineering/
-│   └── 03_modeling/
-│
-├── src/
-│   ├── data/               # Reproducible data pipelines
-│   ├── features/           # Feature engineering logic
-│   ├── models/             # Training & evaluation code
-│   └── utils/
-│
-├── models/                 # Saved model artifacts
-├── reports/                # EDA and evaluation outputs
-│
-├── docker/                 # Docker & container configs
-├── .gitignore
-├── requirements.txt
-├── README.md
-└── Makefile
-
-
-
-9. MLOps & Deployment Roadmap
-
-The project is designed to evolve into a production-ready system, including:
-
-Reproducible training pipelines
-
-- Model versioning
-
-- Dockerized inference service
-
-- Scalable deployment (API-based)
-
-- Clear separation between training and inference logic
-
-
-10. Current Status
-
-- Data cleaning completed (all tables)
-
-- Correct loan-level alignment achieved
-
-- Leakage-safe joins implemented
-
-- Feature engineering in progress
-
-- Model training & evaluation pending
-
-- Deployment & containerization upcoming
-
-
-11. Key Design Principle
-
-This project prioritizes correctness, realism, and business alignment over quick accuracy gains.
-
-The goal is not just to build a model —
-but to build a credible credit risk system.
+The goal is to build a production-ready loan default risk system.
