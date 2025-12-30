@@ -1,175 +1,144 @@
-Loan Default Risk Prediction
+# Loan Default Risk Prediction 
 
-End-to-end data reconciliation and machine learning pipeline for predicting loan default risk using real-world financial data.
 
-Business Context
+End-to-end data reconciliation and machine learning pipeline for predicting loan default risk.
+
+
+## Business Context
 
 Financial institutions face challenges in accurately assessing credit risk due to fragmented data sources and inconsistent customer records.
 
 This project focuses on building a loan-level default prediction system with strong emphasis on data reconciliation, feature integrity, and production-aligned modeling practices.
 
-Problem Statement
+
+## Problem Statement
 
 Predict whether a loan will default using customer demographics, loan attributes, and historical repayment behavior.
 
-Objectives:
+### Objectives:
 
-Preserve loan-level granularity
+- Predict whether a loan will default
+- Preserve loan-level granularity
+- Prevent data leakage
+- Align with real-world credit scoring workflows
 
-Reconcile multiple inconsistent datasets
 
-Prevent data leakage
+## Datasets
 
-Produce a modeling-ready dataset suitable for deployment
+- Loan application data containing 4,368 loans with target labels
+- Customer banking profiles with demographic and account attributes
+- Historical repayment records used to derive behavioral features
 
-Datasets
 
-Loan Application Data
+## Modeling Grain
 
-4,368 loans
+- One row represents one loan
+- All features are aligned to the loan level
+- Historical data is strictly backward-looking
 
-One row per loan
 
-Contains target label
+## Data Reconciliation Summary
 
-Customer Banking Profile
+- Loan application table is used as the master dataset
+- Customer profiles are left-joined using customerid
+- Repayment history is aggregated per customer before merging
+- No labeled loans are dropped during reconciliation
 
-4,334 customer records
 
-Demographic and banking attributes
+## Coverage:
 
-Repayment History
+- Total loans: 4,368
+- Loans with customer profiles: 3,269
+- Loans with repayment history: 4,359
+- Loans missing both profile and history: 4
 
-18,183 historical loans
 
-Used to derive behavioral features
+## Final Modeling Dataset
 
-Modeling Grain
+- Dataset shape: 4,368 rows by 20 features
+- Target variable: good_bad_flag
+- Class distribution reflects real-world imbalance
 
-One row represents one loan
 
-This ensures:
+## Missing Data Strategy
 
-Correct label alignment
+- Rows are preserved to avoid selection bias
+- Missing categorical values are retained as explicit categories
+- Missing numeric values are imputed
+- Missingness is treated as potentially informative
 
-No duplicate loans
 
-Realistic credit risk modeling
-
-Data Reconciliation Summary
-
-Loan application table is used as the master dataset
-
-Customer profiles are left-joined using customerid
-
-Repayment history is aggregated per customer and merged as backward-looking features
-
-No labeled loans are dropped
-
-Coverage:
-
-Total loans: 4,368
-
-Loans with customer profiles: 3,269 (74.8 percent)
-
-Loans with repayment history: 4,359 (99.8 percent)
-
-Loans missing both profile and history: 4
-
-Final Modeling Dataset
-
-Shape: 4,368 rows by 20 features
-
-Target distribution:
-
-Good loans: 2,556
-
-Bad loans: 713
-
-Missing data handling:
-
-Rows are preserved
-
-Missing categorical values retained as explicit categories
-
-Missing numeric values imputed
-
-Missingness treated as informative
-
-Feature Engineering Status
+## Feature Engineering Status
 
 Feature engineering is performed after all data is aligned to the loan level.
 
-Planned feature groups:
+- Demographic features
+- Financial features
+- Behavioral aggregates
+- Temporal features
+- Missingness indicators
 
-Demographic features
 
-Financial features
+## Project Status
 
-Behavioral aggregates
+- Data cleaning completed
+- Data reconciliation completed
+- Modeling dataset finalized
+- Feature engineering in progress
 
-Temporal features
 
-Missingness indicators
+## Repository Structure
 
-Repository Structure
+loan-default-risk/
+│
+├── data/
+│   ├── raw/
+│   │   ├── loan_application.csv
+│   │   ├── customer_banking_profile.csv
+│   │   └── repayment_history.csv
+│   │
+│   ├── interim/
+│   │   ├── loan_application_cleaned.csv
+│   │   ├── customer_banking_profile_cleaned.csv
+│   │   └── repayment_history_cleaned.csv
+│   │
+│   └── processed/
+│       └── loan_level_model_dataset.csv
+│
+├── notebooks/
+│   ├── 01_data_cleaning/
+│   ├── 02_data_reconciliation/
+│   ├── 03_feature_engineering/
+│   └── 04_modeling/
+│
+├── src/
+│   ├── data/
+│   ├── features/
+│   ├── models/
+│   └── utils/
+│
+├── models/
+│   ├── trained/
+│   └── metrics/
+│
+├── reports/
+│   ├── eda/
+│   └── model_performance/
+│
+├── docker/
+│   ├── Dockerfile
+│   └── docker-compose.yml
+│
+├── tests/
+│
+├── requirements.txt
+├── Makefile
+└── README.md
 
-loan-default-risk
 
-data
 
-raw
+## Design Philosophy
 
-interim
+This project prioritizes data integrity, reproducibility, and real-world modeling practices over shortcut performance gains.
 
-processed
-
-notebooks
-
-data_cleaning
-
-data_reconciliation
-
-feature_engineering
-
-modeling
-
-src
-
-data
-
-features
-
-models
-
-utils
-
-reports
-
-docker
-
-tests
-
-requirements.txt
-
-README.md
-
-.gitignore
-
-Project Status
-
-Data cleaning completed
-
-Data reconciliation completed
-
-Modeling dataset finalized
-
-Feature engineering in progress
-
-Modeling and deployment pending
-
-Design Philosophy
-
-This project prioritizes data correctness, transparency, and real-world applicability over shortcut modeling gains.
-
-The goal is to build a production-ready loan default risk system.
+The goal is to build a production-aligned loan default risk system.
