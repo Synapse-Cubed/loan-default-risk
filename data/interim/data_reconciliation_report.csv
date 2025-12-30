@@ -1,0 +1,11 @@
+metric,count
+Total Target Loans,4368
+Unique Customers,4368
+Customers with Profile,3269
+Customers Missing Profile,1099
+Profile Coverage %,74.8%
+Customers with History,4359
+History Coverage %,99.8%
+Historical Loans Available,18183
+Customers Missing Both,4
+Usable for Full Feature Set,3264
