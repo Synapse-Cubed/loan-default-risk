@@ -1,3 +1,14 @@
+## About Synapse³
+
+Synapse³ is a collaborative learning collective focused on building production-oriented data and machine learning systems.
+
+This project is developed as Synapse³’s first end-to-end flagship project, emphasizing:
+- Real-world data challenges
+- Strong data foundations
+- Reproducible machine learning pipelines
+- Clear business alignment
+
+
 # Loan Default Risk Prediction 
 
 
@@ -76,7 +87,7 @@ Feature engineering is performed after all data is aligned to the loan level.
 - Financial features
 - Behavioral aggregates
 - Temporal features
-- Missingness indicators
+- Missing-ness indicators
 
 
 ## Project Status
@@ -88,6 +99,7 @@ Feature engineering is performed after all data is aligned to the loan level.
 
 
 ## Repository Structure
+```
 
 loan-default-risk/
 │
@@ -135,10 +147,21 @@ loan-default-risk/
 ├── Makefile
 └── README.md
 
+```
+
 
 
 ## Design Philosophy
 
 This project prioritizes data integrity, reproducibility, and real-world modeling practices over shortcut performance gains.
 
-The goal is to build a production-aligned loan default risk system.
+The goal is to build a production-aligned loan default risk system
+
+## Project Guidelines
+
+- The loan application table is the single source of truth for labels
+- All feature engineering is performed after data reconciliation
+- No labeled loan is dropped during preprocessing
+- Missing data is treated as informative where applicable
+- Modeling decisions prioritize interpretability alongside performance
+
