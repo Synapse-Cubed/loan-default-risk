@@ -1,4 +1,4 @@
-## About Synapse³
+## About Synapse-Cubed
 
 Synapse³ is a collaborative learning collective focused on building production-oriented data and machine learning systems.
 
