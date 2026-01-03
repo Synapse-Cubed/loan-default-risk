@@ -15,9 +15,6 @@ env/
 .env
 
 # Data files (raw & processed)
-data/raw/
-data/processed/
-*.csv
 *.parquet
 
 # Model artifacts
